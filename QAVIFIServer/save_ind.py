@@ -3,8 +3,8 @@
 import pymongo
 
 coll = pymongo.MongoClient().quantaxis.indicator_plot
-buy_icon = '\ue616'
-sell_icon = '\ue618'
+buy_icon = u'\ue616'
+sell_icon = u'\ue618'
 
 
 class QAIndicatorPlot_AREA():
@@ -32,7 +32,10 @@ class QAIndicatorPlot_AREA():
         return self.data
 
     def save(self):
-        coll.insert_many(self.data)
+        try:
+            coll.insert_many(self.data, ordered=False)
+        except:
+            pass
 
 
 class QAIndicatorPlot_DOT():
@@ -51,7 +54,7 @@ class QAIndicatorPlot_DOT():
                 {
                     'Date': time,
                     'Value': price,
-                    'Symbol': sell_icon,
+                    'Symbol': icon,
                     'Color': color,
                     'Baseline': 0}
             ]
@@ -61,7 +64,10 @@ class QAIndicatorPlot_DOT():
         return self.data
 
     def save(self):
-        coll.insert_many(self.data)
+        try:
+            coll.insert_many(self.data, ordered=False)
+        except:
+            pass
 
 
 class QAIndicatorPlot_PLOYGON():
@@ -95,7 +101,10 @@ class QAIndicatorPlot_PLOYGON():
         return self.data
 
     def save(self):
-        coll.insert_many(self.data)
+        try:
+            coll.insert_many(self.data, ordered=False)
+        except:
+            pass
 
 
 class QAIndicatorPlot_LINE():
@@ -128,4 +137,28 @@ class QAIndicatorPlot_LINE():
         return self.data
 
     def save(self):
-        coll.insert_many(self.data)
+        try:
+            coll.insert_many(self.data, ordered=False)
+        except:
+            pass
+
+
+if __name__ == "__main__":
+    area1 = QAIndicatorPlot_AREA('000002', 'ax2')
+    area1.add_datapoint(20200202, 20200302)
+    area1.add_datapoint(20200322, 20200328)
+    area1.save()
+
+    line1 = QAIndicatorPlot_LINE('000002', 'ax2')
+    line1.add_datapoint(array=[{'Date': 20200220, 'Value': 10}, {
+                        'Date': 20200320, 'Value': 20}])
+    line1.save()
+
+    ploy1 = QAIndicatorPlot_PLOYGON('000002', 'ax2')
+    ploy1.add_datapoint(array=[
+        {'Date': 20191227, 'Value': 16.0},
+        {'Date': 20200116, 'Value': 16.0},
+        {'Date': 20200116, 'Value': 14.0},
+        {'Date': 20191227, 'Value': 14.0}],
+        bgcolor='rgba(255,255,0,0.5)')
+    ploy1.save()
