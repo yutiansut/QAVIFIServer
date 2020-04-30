@@ -125,7 +125,7 @@ class polygon():
 
 
 class QAIndicatorHandler(QABaseHandler):
-    coll = pymongo.MongoClient().quantaxis.indicator_plot
+    coll = pymongo.MongoClient('192.168.2.117').quantaxis.indicator_plot
 
     def get(self):
         """

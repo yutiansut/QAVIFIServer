@@ -168,25 +168,26 @@ class QAIndicatorPlot_LINE():
 
 
 if __name__ == "__main__":
-    area1 = QAIndicatorPlot_AREA('000001', 'ax2')
+    area1 = QAIndicatorPlot_AREA('000001', 'ax3')
     area1.add_datapoint(20200202, 20200302, convert_color('green', 0.5))
-    area1.add_datapoint(20200322, 20200328, convert_color('purple', 0.5))
+    area1.add_datapoint(20200322, 20200328, convert_color('red', 0.5))
+    area1.add_datapoint(20190812, 20190905, convert_color('yellow', 0.3))
     area1.save()
 
-    line1 = QAIndicatorPlot_LINE('000001', 'ax2')
-    line1.add_datapoint(array=[{'Date': 20200220, 'Value': 10}, {
-                        'Date': 20200320, 'Value': 20}], color= convert_color('yellow'))
+    line1 = QAIndicatorPlot_LINE('000001', 'ax3')
+    line1.add_datapoint(array=[{'Date': 20190918, 'Value': 14.24}, {
+                        'Date': 20191014, 'Value': 17.6}], color= convert_color('pink'))
     line1.save()
 
-    ploy1 = QAIndicatorPlot_PLOYGON('000001', 'ax2')
+    ploy1 = QAIndicatorPlot_PLOYGON('000001', 'ax3')
     ploy1.add_datapoint(array=[
         {'Date': 20191227, 'Value': 16.0},
         {'Date': 20200116, 'Value': 16.0},
         {'Date': 20200116, 'Value': 14.0},
         {'Date': 20191227, 'Value': 14.0}],
-        bgcolor= convert_color('purple', 0.5))
+        bgcolor= convert_color('pink', 0.5))
     ploy1.save()
 
-    dot1 = QAIndicatorPlot_DOT('000001', 'ax2')
+    dot1 = QAIndicatorPlot_DOT('000001', 'ax3')
     dot1.add_datapoint(20200325, 30, 'buy', 'blue')
     dot1.save()
