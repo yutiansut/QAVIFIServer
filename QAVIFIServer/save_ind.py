@@ -2,12 +2,32 @@
 
 import pymongo
 
-from webcolors import name_to_hex
+from webcolors import name_to_rgb
 
 coll = pymongo.MongoClient().quantaxis.indicator_plot
 
 buy_icon = "buy"
 sell_icon = "sell"
+
+def convert_color(color, tran=1):
+    """
+    color =>color
+    """
+
+    if color.startswith('rgb') or color.startswith('#'):
+        pass
+    else:
+        try:
+            color = name_to_rgb(color)
+        except:
+            color =  name_to_rgb('black')
+
+
+        tran =1 if abs(tran)>=1 else abs(tran)
+        color = "rgba({},{},{},{})".format(color.red, color.yellow, color.blue, tran)
+
+    return color
+
 
 
 class QAIndicatorPlot_AREA():
@@ -16,7 +36,7 @@ class QAIndicatorPlot_AREA():
         self.uniid = uniid
         self.data = []
 
-    def add_datapoint(self, start, end):
+    def add_datapoint(self, start, end, color= "rgba(250,128,144,0.5)"):
         self.data.append({
             'type': 'area',
             'id': self.uniid,
@@ -26,7 +46,7 @@ class QAIndicatorPlot_AREA():
                 {
                     'Start': {'Date': start, 'Time': None},
                     'End': {'Date': end, 'Time': None},
-                    'Color': 'rgba(250,128,144,0.5)'
+                    'Color': convert_color(color)
                 }
             ]
         })
@@ -49,13 +69,7 @@ class QAIndicatorPlot_DOT():
 
     def add_datapoint(self, time, price, icon, color='rgb(0,0,0)'):
 
-        if color.startswith('rgb') or color.startswith('#'):
-            pass
-        else:
-            try:
-                color = name_to_hex(color)
-            except:
-                color =  'rgb(0,0,0)'
+        color = convert_color(color)
         self.data.append({
             'type': 'dot',
             'id': self.uniid,
@@ -101,8 +115,8 @@ class QAIndicatorPlot_PLOYGON():
             'data': [
                 # 例如：矩型
                 {
-                    'Color': color,
-                    'BGColor': bgcolor,
+                    'Color': convert_color(color),
+                    'BGColor': convert_color(bgcolor, 0.5),
                     'Point': array
                 },
             ]
@@ -137,9 +151,8 @@ class QAIndicatorPlot_LINE():
             "code": self.code,
             'data': [
                 {
-                    'Color': color,  # 直线颜色
-                    # 一条直线这一项可不写
-                    'BGColor': bgcolor,
+                    'Color': convert_color(color),
+                    'BGColor': convert_color(bgcolor, 0.5),
                     'Point': array
                 },
             ]})
