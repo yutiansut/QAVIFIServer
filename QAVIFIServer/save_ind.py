@@ -2,9 +2,12 @@
 
 import pymongo
 
+from webcolors import name_to_hex
+
 coll = pymongo.MongoClient().quantaxis.indicator_plot
-buy_icon = u'\ue616'
-sell_icon = u'\ue618'
+
+buy_icon = "buy"
+sell_icon = "sell"
 
 
 class QAIndicatorPlot_AREA():
@@ -45,6 +48,14 @@ class QAIndicatorPlot_DOT():
         self.data = []
 
     def add_datapoint(self, time, price, icon, color='rgb(0,0,0)'):
+
+        if color.startswith('rgb') or color.startswith('#'):
+            pass
+        else:
+            try:
+                color = name_to_hex(color)
+            except:
+                color =  'rgb(0,0,0)'
         self.data.append({
             'type': 'dot',
             'id': self.uniid,
@@ -144,21 +155,25 @@ class QAIndicatorPlot_LINE():
 
 
 if __name__ == "__main__":
-    area1 = QAIndicatorPlot_AREA('000002', 'ax2')
-    area1.add_datapoint(20200202, 20200302)
-    area1.add_datapoint(20200322, 20200328)
-    area1.save()
+    # area1 = QAIndicatorPlot_AREA('000002', 'ax2')
+    # area1.add_datapoint(20200202, 20200302)
+    # area1.add_datapoint(20200322, 20200328)
+    # area1.save()
 
-    line1 = QAIndicatorPlot_LINE('000002', 'ax2')
-    line1.add_datapoint(array=[{'Date': 20200220, 'Value': 10}, {
-                        'Date': 20200320, 'Value': 20}])
-    line1.save()
+    # line1 = QAIndicatorPlot_LINE('000002', 'ax2')
+    # line1.add_datapoint(array=[{'Date': 20200220, 'Value': 10}, {
+    #                     'Date': 20200320, 'Value': 20}])
+    # line1.save()
 
-    ploy1 = QAIndicatorPlot_PLOYGON('000002', 'ax2')
-    ploy1.add_datapoint(array=[
-        {'Date': 20191227, 'Value': 16.0},
-        {'Date': 20200116, 'Value': 16.0},
-        {'Date': 20200116, 'Value': 14.0},
-        {'Date': 20191227, 'Value': 14.0}],
-        bgcolor='rgba(255,255,0,0.5)')
-    ploy1.save()
+    # ploy1 = QAIndicatorPlot_PLOYGON('000002', 'ax2')
+    # ploy1.add_datapoint(array=[
+    #     {'Date': 20191227, 'Value': 16.0},
+    #     {'Date': 20200116, 'Value': 16.0},
+    #     {'Date': 20200116, 'Value': 14.0},
+    #     {'Date': 20191227, 'Value': 14.0}],
+    #     bgcolor='rgba(255,255,0,0.5)')
+    # ploy1.save()
+
+    dot1 = QAIndicatorPlot_DOT('000002', 'ax2')
+    dot1.add_datapoint(20200325, 30, 'buy', 'blue')
+    dot1.save()
