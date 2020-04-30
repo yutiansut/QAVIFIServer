@@ -24,7 +24,7 @@ def convert_color(color, tran=1):
 
 
         tran =1 if abs(tran)>=1 else abs(tran)
-        color = "rgba({},{},{},{})".format(color.red, color.yellow, color.blue, tran)
+        color = "rgba({},{},{},{})".format(color.red, color.green, color.blue, tran)
 
     return color
 
@@ -168,25 +168,25 @@ class QAIndicatorPlot_LINE():
 
 
 if __name__ == "__main__":
-    # area1 = QAIndicatorPlot_AREA('000002', 'ax2')
-    # area1.add_datapoint(20200202, 20200302)
-    # area1.add_datapoint(20200322, 20200328)
-    # area1.save()
+    area1 = QAIndicatorPlot_AREA('000001', 'ax2')
+    area1.add_datapoint(20200202, 20200302, convert_color('green', 0.5))
+    area1.add_datapoint(20200322, 20200328, convert_color('purple', 0.5))
+    area1.save()
 
-    # line1 = QAIndicatorPlot_LINE('000002', 'ax2')
-    # line1.add_datapoint(array=[{'Date': 20200220, 'Value': 10}, {
-    #                     'Date': 20200320, 'Value': 20}])
-    # line1.save()
+    line1 = QAIndicatorPlot_LINE('000001', 'ax2')
+    line1.add_datapoint(array=[{'Date': 20200220, 'Value': 10}, {
+                        'Date': 20200320, 'Value': 20}], color= convert_color('yellow'))
+    line1.save()
 
-    # ploy1 = QAIndicatorPlot_PLOYGON('000002', 'ax2')
-    # ploy1.add_datapoint(array=[
-    #     {'Date': 20191227, 'Value': 16.0},
-    #     {'Date': 20200116, 'Value': 16.0},
-    #     {'Date': 20200116, 'Value': 14.0},
-    #     {'Date': 20191227, 'Value': 14.0}],
-    #     bgcolor='rgba(255,255,0,0.5)')
-    # ploy1.save()
+    ploy1 = QAIndicatorPlot_PLOYGON('000001', 'ax2')
+    ploy1.add_datapoint(array=[
+        {'Date': 20191227, 'Value': 16.0},
+        {'Date': 20200116, 'Value': 16.0},
+        {'Date': 20200116, 'Value': 14.0},
+        {'Date': 20191227, 'Value': 14.0}],
+        bgcolor= convert_color('purple', 0.5))
+    ploy1.save()
 
-    dot1 = QAIndicatorPlot_DOT('000002', 'ax2')
+    dot1 = QAIndicatorPlot_DOT('000001', 'ax2')
     dot1.add_datapoint(20200325, 30, 'buy', 'blue')
     dot1.save()
