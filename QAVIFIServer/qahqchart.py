@@ -110,26 +110,38 @@ class HqKline():
 
     @property
     def data(self):
-
+        if self.frequence != 'day':
+            self.frequence = '1min'
         data = QA.QA_quotation(self.symbol, self.start, self.end, self.frequence, self.market,
                                source=QA.DATASOURCE.MONGO, output=QA.OUTPUT_FORMAT.DATASTRUCT).data.reset_index()
         # print('data')
         if self.frequence != 'day':
+            #self.frequence = '1min'
             data = data.assign(
-                date=data.datetime.apply(lambda x: str(x)[0:10]))
+                date=data.datetime.apply(lambda x: str(x)[0:10]), time=data.datetime.apply(lambda x: int(str(x)[11:16].replace(':', ''))))
+
         if self.market != 'stock_cn':
-            data = data.assign(amount=data.volume * data.close)
+            data=data.assign(amount=data.volume * data.close)
         return data
         # return QA.QA_fetch_stock_day(self.symbol[0:6], self.start, self.end, 'pd')
 
     def klineformat(self):
         return []
 
-    def to_json(self):
 
+    @property
+    def datavalue(self):
+        if self.frequence == 'day':
+            return self.data.assign(date=self.data.date.apply(lambda x: QA.QA_util_date_str2int(str(x)[0:10])),
+            yclose=self.data.close.shift().bfill()).loc[:, ['date', 'yclose', 'open', 'high', 'low', 'close', 'volume', 'amount']].values.tolist()
+        else:
+            return self.data.assign(date=self.data.date.apply(lambda x: QA.QA_util_date_str2int(str(x)[0:10])),
+            yclose=self.data.close.shift().bfill()).loc[:, ['date', 'yclose', 'open', 'high', 'low', 'close', 'volume', 'amount', 'time']].values.tolist()
+
+    def to_json(self):
+        #print(self.datavalue)
         return {
-            "data": self.data.assign(date=self.data.date.apply(lambda x: QA.QA_util_date_str2int(str(x)[0:10])), 
-            yclose=self.data.close.shift().bfill()).loc[:, ['date', 'yclose', 'open', 'high', 'low', 'close', 'volume', 'amount']].values.tolist(),
+            "data": self.datavalue,
             "symbol": self.symbol,  # 股票代码
             "name": self.name,  # 股票名称
             "start": 4837,  # 返回数据的起始位置 （暂时不用， 分页下载历史数据使用，下载都是一次请求完)
@@ -145,20 +157,20 @@ class HqKline():
 class QAHqchartDailyHandler(QABaseHandler):
     def get(self):
 
-        t = HqTrend()
+        t=HqTrend()
         t.recv()
         self.write({'result': t.to_json()})
 
 
 class QAHqchartKlineHandler(QABaseHandler):
     def get(self):
-        code = self.get_argument('code', '600000.sh')
-        start = self.get_argument('start', '2019-01-01')
-        end = self.get_argument('end', default='2020-04-01')
-        frequence = self.get_argument('frequence', 'day')
-        market = self.get_argument('market', 'stock_cn')
+        code=self.get_argument('code', '600000.sh')
+        start=self.get_argument('start', '2019-01-01')
+        end=self.get_argument('end', default='2020-04-01')
+        frequence=self.get_argument('frequence', 'day')
+        market=self.get_argument('market', 'stock_cn')
 
-        t = HqKline(code, start, end, frequence, market)
+        t=HqKline(code, start, end, frequence, market)
         # t#.recv()
         self.write({'result': {
                     'kline': t.to_json(),
@@ -169,16 +181,16 @@ class QAHqchartKlineHandler(QABaseHandler):
                                 {
                                     'Date': 20200220,
                                     'Value': 16.5,
-                                    'Symbol': '\ue616', # \ue616(买) \ue618（卖）
+                                    'Symbol': '\ue616',  # \ue616(买) \ue618（卖）
                                     'Color': 'rgb(240,0,0)',
-                                    'Baseline': 0 # 0 居中 1 上 2 下
+                                    'Baseline': 0  # 0 居中 1 上 2 下
                                 },
                                 {
                                     'Date': 20200318,
                                     'Value': 13.5,
-                                    'Symbol': '\ue618', # \ue616(买) \ue618（卖）
+                                    'Symbol': '\ue618',  # \ue616(买) \ue618（卖）
                                     'Color': 'rgb(240,240,0)',
-                                    'Baseline': 0 # 0 居中 1 上 2 下
+                                    'Baseline': 0  # 0 居中 1 上 2 下
                                 }
                             ]
                         },
@@ -186,16 +198,18 @@ class QAHqchartKlineHandler(QABaseHandler):
                             'type': 'line',
                             'data': [
                                 {
-                                    'Color': 'rgb(255,0,0)', # 直线颜色
-                                    'BGColor': 'rgba(255,0,0,0.5)', # 一条直线这一项可不写
+                                    'Color': 'rgb(255,0,0)',  # 直线颜色
+                                    # 一条直线这一项可不写
+                                    'BGColor': 'rgba(255,0,0,0.5)',
                                     'Point': [
                                         {'Date': 20200220, 'Value': 16.5},
                                         {'Date': 20200318, 'Value': 13.5}
                                     ]
                                 },
                                 {
-                                    'Color': 'rgb(255,0,0)', # 直线颜色
-                                    'BGColor': 'rgba(255,0,0,0.5)', # 一条直线这一项可不写
+                                    'Color': 'rgb(255,0,0)',  # 直线颜色
+                                    # 一条直线这一项可不写
+                                    'BGColor': 'rgba(255,0,0,0.5)',
                                     'Point': [
                                         {'Date': 20200220, 'Value': 13.5},
                                         {'Date': 20200318, 'Value': 16.5}
@@ -265,7 +279,7 @@ if __name__ == "__main__":
     from tornado.web import Application, RequestHandler, authenticated
     from tornado.websocket import WebSocketHandler
 
-    app = Application(
+    app=Application(
         handlers=[
             (r"/test",  QAHqchartDailyHandler),
             (r"/testk", QAHqchartKlineHandler)
