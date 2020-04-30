@@ -90,13 +90,14 @@ class HqTrend():
 
 
 class HqKline():
-    def __init__(self, code, start, end, frequence, market):
+    def __init__(self, code, start, end, frequence, market, raw='true'):
         self.symbol = code
 
         self.start = start
         self.end = end
         self.frequence = frequence
         self.market = market
+        self.raw = raw
 
     @property
     def name(self):
@@ -110,7 +111,7 @@ class HqKline():
 
     @property
     def data(self):
-        if self.frequence != 'day':
+        if self.raw != 'true' and self.frequence!='day':
             self.frequence = '1min'
         data = QA.QA_quotation(self.symbol, self.start, self.end, self.frequence, self.market,
                                source=QA.DATASOURCE.MONGO, output=QA.OUTPUT_FORMAT.DATASTRUCT).data.reset_index()
@@ -169,8 +170,9 @@ class QAHqchartKlineHandler(QABaseHandler):
         end=self.get_argument('end', default='2020-04-01')
         frequence=self.get_argument('frequence', 'day')
         market=self.get_argument('market', 'stock_cn')
-
-        t=HqKline(code, start, end, frequence, market)
+        raw=self.get_argument('raw', 'true')
+        
+        t=HqKline(code, start, end, frequence, market, raw)
         # t#.recv()
         self.write({'result': {
                     'kline': t.to_json(),
