@@ -89,7 +89,6 @@ class QAIndicatorPlot_TEXT():
             pass
 
 
-
 class QAIndicatorPlot_DOT():
     def __init__(self, code, uniid):
         self.code = code

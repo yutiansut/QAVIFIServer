@@ -120,7 +120,8 @@ class HqKline():
             #self.frequence = '1min'
             data = data.assign(
                 date=data.datetime.apply(lambda x: str(x)[0:10]), time=data.datetime.apply(lambda x: int(str(x)[11:16].replace(':', ''))))
-
+        else:
+            data = data.assign(time=0000)
         if self.market != 'stock_cn':
             data=data.assign(amount=data.volume * data.close)
         return data
@@ -134,7 +135,7 @@ class HqKline():
     def datavalue(self):
         if self.frequence == 'day':
             return self.data.assign(date=self.data.date.apply(lambda x: QA.QA_util_date_str2int(str(x)[0:10])),
-            yclose=self.data.close.shift().bfill()).loc[:, ['date', 'yclose', 'open', 'high', 'low', 'close', 'volume', 'amount']].values.tolist()
+            yclose=self.data.close.shift().bfill()).loc[:, ['date', 'yclose', 'open', 'high', 'low', 'close', 'volume', 'amount', 'time']].values.tolist()
         else:
             return self.data.assign(date=self.data.date.apply(lambda x: QA.QA_util_date_str2int(str(x)[0:10])),
             yclose=self.data.close.shift().bfill()).loc[:, ['date', 'yclose', 'open', 'high', 'low', 'close', 'volume', 'amount', 'time']].values.tolist()
