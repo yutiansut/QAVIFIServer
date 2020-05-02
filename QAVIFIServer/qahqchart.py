@@ -115,17 +115,16 @@ class HqKline():
             self.frequence = '1min'
         data = QA.QA_quotation(self.symbol, self.start, self.end, self.frequence, self.market,
                                source=QA.DATASOURCE.MONGO, output=QA.OUTPUT_FORMAT.DATASTRUCT).data.reset_index()
-        # print('data')
+
         if self.frequence != 'day':
-            #self.frequence = '1min'
+
             data = data.assign(
                 date=data.datetime.apply(lambda x: str(x)[0:10]), time=data.datetime.apply(lambda x: int(str(x)[11:16].replace(':', ''))))
         else:
             data = data.assign(time=0000)
         if self.market != 'stock_cn':
             data=data.assign(amount=data.volume * data.close)
-        return data
-        # return QA.QA_fetch_stock_day(self.symbol[0:6], self.start, self.end, 'pd')
+
 
     def klineformat(self):
         return []

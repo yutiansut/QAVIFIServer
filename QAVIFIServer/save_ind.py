@@ -4,7 +4,7 @@ import pymongo
 
 from webcolors import name_to_rgb
 
-coll = pymongo.MongoClient().quantaxis.indicator_plot
+coll = pymongo.MongoClient('www.quantaxis.tech', 27022).quantaxis.indicator_plot
 
 buy_icon = "buy"
 sell_icon = "sell"
