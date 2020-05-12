@@ -101,7 +101,7 @@ class HqKline():
     def name(self):
         try:
             if self.market == 'stock_cn':
-                return stocklist.loc[self.symbol[0:6]]['name']
+                return self.stocklist.loc[self.symbol[0:6]]['name']
             else:
                 return self.symbol
         except:
@@ -114,6 +114,8 @@ class HqKline():
 
         if self.frequence.endswith('min'):
             self.frequence = self.frequence.split('min')[0]
+        else:
+            self.frequence = '15'
         data = pd.read_csv("G://onedrive/data/assets_md/assetsMD_{}_{}.csv".format(self.symbol, self.frequence))
         print(data)
 
@@ -132,12 +134,19 @@ class HqKline():
     def klineformat(self):
         return []
 
-
     @property
     def datavalue(self):
         if self.frequence == 'day':
-            return self.data.assign(date=self.data.date.apply(lambda x: QA.QA_util_date_str2int(str(x)[0:10])),
-            yclose=self.data.close.shift().bfill()).loc[:, ['date', 'yclose', 'open', 'high', 'low', 'close', 'volume', 'amount', 'time']].values.tolist()
+
+            data = self.data.assign(tradetime=
+                self.data['datetime'].apply(lambda x: str(QA.QAUtil.QADate_trade.QA_util_future_to_tradedatetime(x))))
+            data = QA.QAData.data_resample.QA_data_futuremin_resample_today(data).reset_index()
+            data =  data.assign(date= data.tradedate, time=0000)
+            if 'amount' not in data.columns:
+                data=data.assign(amount=data.volume * data.close)
+
+            return data.assign(date=data.date.apply(lambda x: QA.QA_util_date_str2int(str(x)[0:10])),
+            yclose=data.close.shift().bfill()).loc[:, ['date', 'yclose', 'open', 'high', 'low', 'close', 'volume', 'amount', 'time']].values.tolist()
         else:
             return self.data.assign(date=self.data.date.apply(lambda x: QA.QA_util_date_str2int(str(x)[0:10])),
             yclose=self.data.close.shift().bfill()).loc[:, ['date', 'yclose', 'open', 'high', 'low', 'close', 'volume', 'amount', 'time']].values.tolist()
