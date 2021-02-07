@@ -6,9 +6,9 @@ quantaxis vifi server
 
 
 
-首先本地安装QUANTAXIS/  QUANTAXIS_WEBSERVER
+首先本地安装QUANTAXIS/  QUANTAXIS_WEBSERVER / qavifiserver
 
-然后端口会开在8019
+然后端口会开在8029
 
 
 
