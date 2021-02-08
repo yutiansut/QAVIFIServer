@@ -124,7 +124,7 @@ class HqKline():
             data = data.assign(time=0000)
         if self.market != 'stock_cn':
             data=data.assign(amount=data.volume * data.close)
-
+        return data
 
     def klineformat(self):
         return []
