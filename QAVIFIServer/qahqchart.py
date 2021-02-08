@@ -129,9 +129,12 @@ class HqKline():
         if self.market != 'stock_cn':
             data=data.assign(amount=data.volume * data.close)
         return data
+<<<<<<< HEAD
 
     @property
     def data(self):
+=======
+>>>>>>> 6b2b7f7c675636bf36a7bb676f527685e9cedee0
 
         if self.model != 'diff':
             
