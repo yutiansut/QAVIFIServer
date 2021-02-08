@@ -98,8 +98,7 @@ class HqKline():
         self.frequence = frequence
         self.market = market
         self.raw = raw
-        self.model =  ''
-        
+        self.model = ''
 
         if '-' in code:
             self.model = 'diff'
@@ -115,11 +114,11 @@ class HqKline():
             return ''
 
     def get_data(self, code):
-        if self.raw != 'true' and self.frequence!='day':
+        if self.raw != 'true' and self.frequence != 'day':
             self.frequence = '1min'
         data = QA.QA_quotation(code.upper(), self.start, self.end, self.frequence, self.market,
-                    source=QA.DATASOURCE.MONGO, output=QA.OUTPUT_FORMAT.DATASTRUCT).data.reset_index()
-        #print(data)
+                               source=QA.DATASOURCE.MONGO, output=QA.OUTPUT_FORMAT.DATASTRUCT).data.reset_index()
+        # print(data)
         if self.frequence != 'day':
 
             data = data.assign(
@@ -127,47 +126,45 @@ class HqKline():
         else:
             data = data.assign(time=0000)
         if self.market != 'stock_cn':
-            data=data.assign(amount=data.volume * data.close)
+            data = data.assign(amount=data.volume * data.close)
         return data
-<<<<<<< HEAD
 
     @property
     def data(self):
-=======
->>>>>>> 6b2b7f7c675636bf36a7bb676f527685e9cedee0
 
         if self.model != 'diff':
-            
+
             return self.get_data(self.symbol)
         else:
             symbols = self.symbol.split('-')
             print(symbols)
             print(QA.DATABASE)
-            a =  self.get_data(symbols[0]).set_index('datetime')
-            b =  self.get_data(symbols[1]).set_index('datetime')
-            #print(len(a))
-            #print(len(b))
-            a.loc[:,['open', 'high', 'low', 'close', 'volume']] = a.loc[:,['open', 'high', 'low', 'close', 'volume']] - b.loc[:,['open', 'high', 'low', 'close', 'volume']]
-            #print(b)
+            a = self.get_data(symbols[0]).set_index('datetime')
+            b = self.get_data(symbols[1]).set_index('datetime')
+            # print(len(a))
+            # print(len(b))
+            a.loc[:, ['open', 'high', 'low', 'close', 'volume']] = a.loc[:, ['open', 'high',
+                                                                             'low', 'close', 'volume']] - b.loc[:, ['open', 'high', 'low', 'close', 'volume']]
+            # print(b)
             #a= a.assign(code=symbols)
-            #print(a)
+            # print(a)
             return a.reset_index()
-            #return a-b
+            # return a-b
+
     def klineformat(self):
         return []
-
 
     @property
     def datavalue(self):
         if self.frequence == 'day':
             return self.data.assign(date=self.data.date.apply(lambda x: QA.QA_util_date_str2int(str(x)[0:10])),
-            yclose=self.data.close.shift().bfill()).loc[:, ['date', 'yclose', 'open', 'high', 'low', 'close', 'volume', 'amount', 'time']].values.tolist()
+                                    yclose=self.data.close.shift().bfill()).loc[:, ['date', 'yclose', 'open', 'high', 'low', 'close', 'volume', 'amount', 'time']].values.tolist()
         else:
             return self.data.assign(date=self.data.date.apply(lambda x: QA.QA_util_date_str2int(str(x)[0:10])),
-            yclose=self.data.close.shift().bfill()).loc[:, ['date', 'yclose', 'open', 'high', 'low', 'close', 'volume', 'amount', 'time']].values.tolist()
+                                    yclose=self.data.close.shift().bfill()).loc[:, ['date', 'yclose', 'open', 'high', 'low', 'close', 'volume', 'amount', 'time']].values.tolist()
 
     def to_json(self):
-        #print(self.datavalue)
+        # print(self.datavalue)
         return {
             "data": self.datavalue,
             "symbol": self.symbol,  # 股票代码
@@ -185,22 +182,22 @@ class HqKline():
 class QAHqchartDailyHandler(QABaseHandler):
     def get(self):
 
-        t=HqTrend()
+        t = HqTrend()
         t.recv()
         self.write({'result': t.to_json()})
 
 
 class QAHqchartKlineHandler(QABaseHandler):
     def get(self):
-        code=self.get_argument('code', '600000.sh')
-        start=self.get_argument('start', '2019-01-01')
-        end=self.get_argument('end', default='2020-04-01')
-        frequence=self.get_argument('frequence', 'day')
-        market=self.get_argument('market', 'stock_cn')
-        raw=self.get_argument('raw', 'true')
-        
-        t=HqKline(code, start, end, frequence, market, raw)
-        #print(t.data)
+        code = self.get_argument('code', '600000.sh')
+        start = self.get_argument('start', '2019-01-01')
+        end = self.get_argument('end', default='2020-04-01')
+        frequence = self.get_argument('frequence', 'day')
+        market = self.get_argument('market', 'stock_cn')
+        raw = self.get_argument('raw', 'true')
+
+        t = HqKline(code, start, end, frequence, market, raw)
+        # print(t.data)
         # t#.recv()
         self.write({'result': {
                     'kline': t.to_json(),
@@ -309,7 +306,7 @@ if __name__ == "__main__":
     from tornado.web import Application, RequestHandler, authenticated
     from tornado.websocket import WebSocketHandler
 
-    app=Application(
+    app = Application(
         handlers=[
             (r"/test",  QAHqchartDailyHandler),
             (r"/testk", QAHqchartKlineHandler)

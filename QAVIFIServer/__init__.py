@@ -4,7 +4,7 @@ from tornado.web import Application, RequestHandler, authenticated
 from tornado.websocket import WebSocketHandler
 from qavifiserver.qahqchart import QAHqchartDailyHandler, QAHqchartKlineHandler
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 __author__ = 'yutiansut'
 
 def run_server():
