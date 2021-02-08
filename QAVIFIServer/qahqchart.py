@@ -98,6 +98,11 @@ class HqKline():
         self.frequence = frequence
         self.market = market
         self.raw = raw
+        self.model =  ''
+        
+
+        if '-' in code:
+            self.model = 'diff'
 
     @property
     def name(self):
@@ -109,13 +114,12 @@ class HqKline():
         except:
             return ''
 
-    @property
-    def data(self):
+    def get_data(self, code):
         if self.raw != 'true' and self.frequence!='day':
             self.frequence = '1min'
-        data = QA.QA_quotation(self.symbol, self.start, self.end, self.frequence, self.market,
-                               source=QA.DATASOURCE.MONGO, output=QA.OUTPUT_FORMAT.DATASTRUCT).data.reset_index()
-
+        data = QA.QA_quotation(code.upper(), self.start, self.end, self.frequence, self.market,
+                    source=QA.DATASOURCE.MONGO, output=QA.OUTPUT_FORMAT.DATASTRUCT).data.reset_index()
+        #print(data)
         if self.frequence != 'day':
 
             data = data.assign(
@@ -124,8 +128,28 @@ class HqKline():
             data = data.assign(time=0000)
         if self.market != 'stock_cn':
             data=data.assign(amount=data.volume * data.close)
+        return data
 
+    @property
+    def data(self):
 
+        if self.model != 'diff':
+            
+            return self.get_data(self.symbol)
+        else:
+            symbols = self.symbol.split('-')
+            print(symbols)
+            print(QA.DATABASE)
+            a =  self.get_data(symbols[0]).set_index('datetime')
+            b =  self.get_data(symbols[1]).set_index('datetime')
+            #print(len(a))
+            #print(len(b))
+            a.loc[:,['open', 'high', 'low', 'close', 'volume']] = a.loc[:,['open', 'high', 'low', 'close', 'volume']] - b.loc[:,['open', 'high', 'low', 'close', 'volume']]
+            #print(b)
+            #a= a.assign(code=symbols)
+            #print(a)
+            return a.reset_index()
+            #return a-b
     def klineformat(self):
         return []
 
@@ -173,6 +197,7 @@ class QAHqchartKlineHandler(QABaseHandler):
         raw=self.get_argument('raw', 'true')
         
         t=HqKline(code, start, end, frequence, market, raw)
+        #print(t.data)
         # t#.recv()
         self.write({'result': {
                     'kline': t.to_json(),
